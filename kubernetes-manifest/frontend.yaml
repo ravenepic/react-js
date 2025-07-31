@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: krshyamsankar146/frontend-js:latest
+          image: shyamsankar146/frontend-js:latest
           env:
             - name: VITE_REACT_APP_API_URL
               value: "http://localhost:3000/api/questions"
