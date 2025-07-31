@@ -1,6 +1,7 @@
 name: React.js CI
 
 on:
+  push: branchesL "master"
   pull_request:
     branches: "master"
 
