@@ -162,12 +162,6 @@ jobs:
       - name: 📦 Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🔐 Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: arn:aws:iam::038462760458:role/GitHubActionsEKSRole
-          aws-region: ap-south-1
-
       - name: 🧰 Install dependencies
         run: |
           sudo apt-get update
