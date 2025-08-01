@@ -52,6 +52,7 @@ jobs:
             -Dsonar.host.url=${{ secrets.SONAR_URL }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.sources=src/
+            -Dsonar.exclusions=node_modules/**,**/*.spec.js,**/__tests__/**,dist/**,coverage/**
             -Dsonar.verbose=true
 
   backend-test:
@@ -96,6 +97,7 @@ jobs:
             -Dsonar.host.url=${{ secrets.SONAR_URL }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.sources=.
+            -Dsonar.exclusions=node_modules/**,**/*.spec.js,**/__tests__/**,dist/**,coverage/**
             -Dsonar.verbose=true
 
   frontend-image:
