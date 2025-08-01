@@ -25,7 +25,7 @@ spec:
           image: shyamsankar146/frontend-js:latest
           env:
             - name: VITE_REACT_APP_API_URL
-              value: "http://quiz-app-alb-2138311119.ap-south-1.elb.amazonaws/api/questions"
+              value: "http://backend-service:3000/api/questions"
           ports:
             - containerPort: 8080
 ---
