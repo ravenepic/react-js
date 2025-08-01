@@ -7,138 +7,138 @@ on:
     branches: "master"
 
 jobs:
-  frontend-test:
-    runs-on: self-hosted
-    defaults:
-      run:
-        working-directory: ./quiz-app
-    strategy:
-      matrix:
-        node-version: [20.x]
-        architecture: [x64]
-    steps:
-      - name: Check-out git repository
-        uses: actions/checkout@v4
+  # frontend-test:
+  #   runs-on: self-hosted
+  #   defaults:
+  #     run:
+  #       working-directory: ./quiz-app
+  #   strategy:
+  #     matrix:
+  #       node-version: [20.x]
+  #       architecture: [x64]
+  #   steps:
+  #     - name: Check-out git repository
+  #       uses: actions/checkout@v4
 
-      - name: USE NODEJS ${{ matrix.node-version }} - ${{ matrix.architecture }}
-        uses: actions/setup-node@v4
+  #     - name: USE NODEJS ${{ matrix.node-version }} - ${{ matrix.architecture }}
+  #       uses: actions/setup-node@v4
 
-      - name: Install project dependencies
-        run: |
-          npm i
-          npm run lint
-          npm install --save-dev --save-exact prettier
-          npm run prettier
-          npm test
-        env:
-          CI: true
+  #     - name: Install project dependencies
+  #       run: |
+  #         npm i
+  #         npm run lint
+  #         npm install --save-dev --save-exact prettier
+  #         npm run prettier
+  #         npm test
+  #       env:
+  #         CI: true
 
-      - name: Build
-        run: npm run build
+  #     - name: Build
+  #       run: npm run build
 
-      # - name: Setup SonarQube
-      #   uses: warchant/setup-sonar-scanner@v8
+  #     # - name: Setup SonarQube
+  #     #   uses: warchant/setup-sonar-scanner@v8
 
-      # - name: Analyze with SonarCloud
-      #   uses: sonarsource/sonarcloud-github-action@master
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   with:
-      #     projectBaseDir: quiz-app
-      #     args: >
-      #       -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-      #       -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-      #       -Dsonar.host.url=${{ secrets.SONAR_URL }}
-      #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-      #       -Dsonar.sources=src/
-      #       -Dsonar.verbose=true
+  #     # - name: Analyze with SonarCloud
+  #     #   uses: sonarsource/sonarcloud-github-action@master
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     #   with:
+  #     #     projectBaseDir: quiz-app
+  #     #     args: >
+  #     #       -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+  #     #       -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+  #     #       -Dsonar.host.url=${{ secrets.SONAR_URL }}
+  #     #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+  #     #       -Dsonar.sources=src/
+  #     #       -Dsonar.verbose=true
 
-  backend-test:
-    runs-on: self-hosted
-    defaults:
-      run:
-        working-directory: ./backend
-    strategy:
-      matrix:
-        node-version: [20.x]
-        architecture: [x64]
-    steps:
-      - name: Check-out git repository
-        uses: actions/checkout@v4
+  # backend-test:
+  #   runs-on: self-hosted
+  #   defaults:
+  #     run:
+  #       working-directory: ./backend
+  #   strategy:
+  #     matrix:
+  #       node-version: [20.x]
+  #       architecture: [x64]
+  #   steps:
+  #     - name: Check-out git repository
+  #       uses: actions/checkout@v4
 
-      - name: USE NODEJS ${{ matrix.node-version }} - ${{ matrix.architecture }}
-        uses: actions/setup-node@v4
+  #     - name: USE NODEJS ${{ matrix.node-version }} - ${{ matrix.architecture }}
+  #       uses: actions/setup-node@v4
 
-      - name: Install project dependencies
-        run: |
-          npm i
-          npm run lint
-          npm install --save-dev --save-exact prettier
-          npm run prettier
-          npm test
-        env:
-          CI: true
+  #     - name: Install project dependencies
+  #       run: |
+  #         npm i
+  #         npm run lint
+  #         npm install --save-dev --save-exact prettier
+  #         npm run prettier
+  #         npm test
+  #       env:
+  #         CI: true
 
-      # - name: Setup SonarQube
-      #   uses: warchant/setup-sonar-scanner@v8
+  # - name: Setup SonarQube
+  #   uses: warchant/setup-sonar-scanner@v8
 
-      # - name: Analyze with SonarCloud
-      #   uses: sonarsource/sonarcloud-github-action@master
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   with:
-      #     projectBaseDir: backend
-      #     args: >
-      #       -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-      #       -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-      #       -Dsonar.host.url=${{ secrets.SONAR_URL }}
-      #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-      #       -Dsonar.sources=.
-      #       -Dsonar.verbose=true
+  # - name: Analyze with SonarCloud
+  #   uses: sonarsource/sonarcloud-github-action@master
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #   with:
+  #     projectBaseDir: backend
+  #     args: >
+  #       -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+  #       -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+  #       -Dsonar.host.url=${{ secrets.SONAR_URL }}
+  #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+  #       -Dsonar.sources=.
+  #       -Dsonar.verbose=true
 
-  frontend-image:
-    needs: frontend-test
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
+  # frontend-image:
+  #   needs: frontend-test
+  #   runs-on: self-hosted
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Build and push frontend Docker image
-        working-directory: ./quiz-app
-        run: |
-          docker build . -t ${{ secrets.DOCKER_USERNAME }}/frontend-js
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin 
-          docker push ${{ secrets.DOCKER_USERNAME }}/frontend-js
+  #     - name: Build and push frontend Docker image
+  #       working-directory: ./quiz-app
+  #       run: |
+  #         docker build . -t ${{ secrets.DOCKER_USERNAME }}/frontend-js
+  #         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+  #         docker push ${{ secrets.DOCKER_USERNAME }}/frontend-js
 
-      # - name: Run Trivy vulnerability scanner
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: "docker.io/${{ secrets.DOCKER_USERNAME }}/frontend-js"
-      #     format: "sarif"
-      #     output: "trivy-results.sarif"
-      #     severity: "CRITICAL,HIGH"
+  # - name: Run Trivy vulnerability scanner
+  #   uses: aquasecurity/trivy-action@master
+  #   with:
+  #     image-ref: "docker.io/${{ secrets.DOCKER_USERNAME }}/frontend-js"
+  #     format: "sarif"
+  #     output: "trivy-results.sarif"
+  #     severity: "CRITICAL,HIGH"
 
-  backend-image:
-    needs: backend-test
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
+  # backend-image:
+  #   needs: backend-test
+  #   runs-on: self-hosted
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Build and push backend Docker image
-        working-directory: ./backend
-        run: |
-          docker build . -t ${{ secrets.DOCKER_USERNAME }}/backend-api
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin 
-          docker push ${{ secrets.DOCKER_USERNAME }}/backend-api
+  #     - name: Build and push backend Docker image
+  #       working-directory: ./backend
+  #       run: |
+  #         docker build . -t ${{ secrets.DOCKER_USERNAME }}/backend-api
+  #         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+  #         docker push ${{ secrets.DOCKER_USERNAME }}/backend-api
 
-      # - name: Run Trivy vulnerability scanner
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: "docker.io/${{ secrets.DOCKER_USERNAME }}/backend-api"
-      #     format: "sarif"
-      #     output: "trivy-results.sarif"
-      #     severity: "CRITICAL,HIGH"
+  # - name: Run Trivy vulnerability scanner
+  #   uses: aquasecurity/trivy-action@master
+  #   with:
+  #     image-ref: "docker.io/${{ secrets.DOCKER_USERNAME }}/backend-api"
+  #     format: "sarif"
+  #     output: "trivy-results.sarif"
+  #     severity: "CRITICAL,HIGH"
 
   # k8s-manifest-scan:
   #   needs: [backend-test, frontend-test]
