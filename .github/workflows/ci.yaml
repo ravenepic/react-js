@@ -157,31 +157,31 @@ jobs:
   k8s-deploy:
     needs: [frontend-image, backend-image]
     runs-on: self-hosted
+
     steps:
-      - name: Checkout repo
+      - name: 📦 Checkout repo
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: 🔐 Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install jq
+      - name: 🧰 Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq
+          sudo apt-get install -y jq curl
 
-      - name: Generate static token and kubeconfig
+      - name: ⚙️ Generate kubeconfig with token
+        env:
+          CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+          REGION: ${{ secrets.AWS_REGION }}
         run: |
-          CLUSTER_NAME=${{ secrets.EKS_CLUSTER_NAME }}
-          REGION=${{ secrets.AWS_REGION }}
-
           CLUSTER_INFO=$(aws eks describe-cluster --name "$CLUSTER_NAME" --region "$REGION")
           ENDPOINT=$(echo "$CLUSTER_INFO" | jq -r '.cluster.endpoint')
           CA_DATA=$(echo "$CLUSTER_INFO" | jq -r '.cluster.certificateAuthority.data')
-
           TOKEN=$(aws eks get-token --cluster-name "$CLUSTER_NAME" --region "$REGION" --output json | jq -r '.status.token')
 
           cat <<EOF > /tmp/kubeconfig
@@ -204,15 +204,14 @@ jobs:
               token: "$TOKEN"
           EOF
 
-      - name: Show current context (optional debug)
+      - name: 🔍 Validate kubeconfig context
         run: kubectl --kubeconfig=/tmp/kubeconfig config current-context
 
-      - name: Deploy to Kubernetes
+      - name: 🚀 Deploy to Kubernetes
         run: |
-          kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/secret.yaml
-          kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/database.yaml
-          kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/backend.yaml
-          kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/frontend.yaml
-          kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/ingress.yaml
+          for manifest in secret.yaml database.yaml backend.yaml frontend.yaml ingress.yaml; do
+            kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/$manifest
+          done
+
           kubectl --kubeconfig=/tmp/kubeconfig rollout status deployment/backend -n quiz
           kubectl --kubeconfig=/tmp/kubeconfig rollout status deployment/frontend -n quiz
