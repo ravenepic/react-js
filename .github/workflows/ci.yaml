@@ -162,56 +162,31 @@ jobs:
       - name: 📦 Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🔐 Configure AWS credentials
+      - name: 🔐 Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: arn:aws:iam::038462760458:role/GitHubActionsEKSRole
+          aws-region: ap-south-1
 
       - name: 🧰 Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y jq curl
 
-      - name: ⚙️ Generate kubeconfig with token
-        env:
-          CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
-          REGION: ${{ secrets.AWS_REGION }}
+      - name: ⚙️ Generate kubeconfig from EKS
         run: |
-          CLUSTER_INFO=$(aws eks describe-cluster --name "$CLUSTER_NAME" --region "$REGION")
-          ENDPOINT=$(echo "$CLUSTER_INFO" | jq -r '.cluster.endpoint')
-          CA_DATA=$(echo "$CLUSTER_INFO" | jq -r '.cluster.certificateAuthority.data')
-          TOKEN=$(aws eks get-token --cluster-name "$CLUSTER_NAME" --region "$REGION" --output json | jq -r '.status.token')
-
-          cat <<EOF > /tmp/kubeconfig
-          apiVersion: v1
-          kind: Config
-          clusters:
-          - cluster:
-              server: $ENDPOINT
-              certificate-authority-data: $CA_DATA
-            name: eks-cluster
-          contexts:
-          - context:
-              cluster: eks-cluster
-              user: eks-user
-            name: eks-context
-          current-context: eks-context
-          users:
-          - name: eks-user
-            user:
-              token: "$TOKEN"
-          EOF
+          aws eks update-kubeconfig \
+            --name ${{ secrets.EKS_CLUSTER_NAME }} \
+            --region ${{ secrets.AWS_REGION }}
 
       - name: 🔍 Validate kubeconfig context
-        run: kubectl --kubeconfig=/tmp/kubeconfig config current-context
+        run: kubectl config current-context
 
       - name: 🚀 Deploy to Kubernetes (Namespace quiz)
         run: |
           for manifest in secret.yaml database.yaml backend.yaml frontend.yaml ingress.yaml; do
-            kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/$manifest --validate=false -n quiz
+            kubectl apply -f kubernetes-manifest/$manifest --validate=false -n quiz
           done
 
-          kubectl --kubeconfig=/tmp/kubeconfig rollout status deployment/backend -n quiz
-          kubectl --kubeconfig=/tmp/kubeconfig rollout status deployment/frontend -n quiz
+          kubectl rollout status deployment/backend -n quiz
+          kubectl rollout status deployment/frontend -n quiz
