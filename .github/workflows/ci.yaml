@@ -162,25 +162,14 @@ jobs:
       - name: 📦 Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🧰 Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq curl
-
       - name: ⚙️ Generate kubeconfig from EKS
         run: |
           aws eks update-kubeconfig \
             --name ${{ secrets.EKS_CLUSTER_NAME }} \
             --region ${{ secrets.AWS_REGION }}
 
-      - name: 🔍 Validate kubeconfig context
-        run: kubectl config current-context
-
       - name: 🚀 Deploy to Kubernetes (Namespace quiz)
         run: |
           for manifest in secret.yaml database.yaml backend.yaml frontend.yaml ingress.yaml; do
-            kubectl apply -f kubernetes-manifest/$manifest --validate=false -n quiz
+            kubectl apply -f kubernetes-manifest/$manifest -n quiz
           done
-
-          kubectl rollout status deployment/backend -n quiz
-          kubectl rollout status deployment/frontend -n quiz
