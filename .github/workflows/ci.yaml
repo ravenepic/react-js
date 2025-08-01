@@ -8,7 +8,7 @@ on:
 
 jobs:
   frontend-test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./quiz-app
@@ -55,7 +55,7 @@ jobs:
       #       -Dsonar.verbose=true
 
   backend-test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./backend
@@ -100,7 +100,7 @@ jobs:
 
   frontend-image:
     needs: frontend-test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -121,7 +121,7 @@ jobs:
 
   backend-image:
     needs: backend-test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -142,7 +142,7 @@ jobs:
 
   # k8s-manifest-scan:
   #   needs: [backend-test, frontend-test]
-  #   runs-on: self-hosted
+  #   runs-on: ubuntu-latest
   #   steps:
   #     - uses: actions/checkout@v4
 
@@ -156,7 +156,7 @@ jobs:
 
   k8s-deploy:
     needs: [frontend-image, backend-image]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: 📦 Checkout repo
