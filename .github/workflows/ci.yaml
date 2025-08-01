@@ -207,10 +207,10 @@ jobs:
       - name: 🔍 Validate kubeconfig context
         run: kubectl --kubeconfig=/tmp/kubeconfig config current-context
 
-      - name: 🚀 Deploy to Kubernetes
+      - name: 🚀 Deploy to Kubernetes (Namespace: quiz)
         run: |
           for manifest in secret.yaml database.yaml backend.yaml frontend.yaml ingress.yaml; do
-            kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/$manifest --validate=false
+            kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/$manifest --validate=false -n quiz
           done
 
           kubectl --kubeconfig=/tmp/kubeconfig rollout status deployment/backend -n quiz
