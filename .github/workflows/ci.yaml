@@ -168,20 +168,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
       - name: Generate static token and kubeconfig
         run: |
           CLUSTER_NAME=${{ secrets.EKS_CLUSTER_NAME }}
           REGION=${{ secrets.AWS_REGION }}
 
-          # Get cluster details
           CLUSTER_INFO=$(aws eks describe-cluster --name "$CLUSTER_NAME" --region "$REGION")
           ENDPOINT=$(echo "$CLUSTER_INFO" | jq -r '.cluster.endpoint')
           CA_DATA=$(echo "$CLUSTER_INFO" | jq -r '.cluster.certificateAuthority.data')
 
-          # Get token
           TOKEN=$(aws eks get-token --cluster-name "$CLUSTER_NAME" --region "$REGION" --output json | jq -r '.status.token')
 
-          # Write kubeconfig
           cat <<EOF > /tmp/kubeconfig
           apiVersion: v1
           kind: Config
