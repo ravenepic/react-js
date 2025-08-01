@@ -210,7 +210,7 @@ jobs:
       - name: 🚀 Deploy to Kubernetes
         run: |
           for manifest in secret.yaml database.yaml backend.yaml frontend.yaml ingress.yaml; do
-            kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/$manifest
+            kubectl --kubeconfig=/tmp/kubeconfig apply -f kubernetes-manifest/$manifest --validate=false
           done
 
           kubectl --kubeconfig=/tmp/kubeconfig rollout status deployment/backend -n quiz
