@@ -153,3 +153,32 @@ jobs:
           scan-ref: kubernetes-manifest/
           format: table
           severity: "CRITICAL,HIGH"
+  
+    k8s-deploy:
+    needs: [frontend-image, backend-image]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f kubernetes-manifest/secret.yaml
+          kubectl apply -f kubernetes-manifest/database.yaml
+          kubectl apply -f kubernetes-manifest/backend.yaml
+          kubectl apply -f kubernetes-manifest/frontend.yaml
+          kubectl apply -f kubernetes-manifest/ingress.yaml
+          kubectl rollout status deployment/backend -n quiz
+          kubectl rollout status deployment/frontend -n quiz
+
