@@ -168,22 +168,42 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Update kubeconfig for EKS
+      - name: Generate static token and kubeconfig
         run: |
-          aws eks update-kubeconfig \
-            --name ${{ secrets.EKS_CLUSTER_NAME }} \
-            --region ${{ secrets.AWS_REGION }} \
-            --kubeconfig /tmp/kubeconfig
+          CLUSTER_NAME=${{ secrets.EKS_CLUSTER_NAME }}
+          REGION=${{ secrets.AWS_REGION }}
 
-      - name: Debug EKS token
-        run: |
-          aws eks get-token \
-            --cluster-name ${{ secrets.EKS_CLUSTER_NAME }} \
-            --region ${{ secrets.AWS_REGION }}
+          # Get cluster details
+          CLUSTER_INFO=$(aws eks describe-cluster --name "$CLUSTER_NAME" --region "$REGION")
+          ENDPOINT=$(echo "$CLUSTER_INFO" | jq -r '.cluster.endpoint')
+          CA_DATA=$(echo "$CLUSTER_INFO" | jq -r '.cluster.certificateAuthority.data')
+
+          # Get token
+          TOKEN=$(aws eks get-token --cluster-name "$CLUSTER_NAME" --region "$REGION" --output json | jq -r '.status.token')
+
+          # Write kubeconfig
+          cat <<EOF > /tmp/kubeconfig
+          apiVersion: v1
+          kind: Config
+          clusters:
+          - cluster:
+              server: $ENDPOINT
+              certificate-authority-data: $CA_DATA
+            name: eks-cluster
+          contexts:
+          - context:
+              cluster: eks-cluster
+              user: eks-user
+            name: eks-context
+          current-context: eks-context
+          users:
+          - name: eks-user
+            user:
+              token: "$TOKEN"
+          EOF
 
       - name: Show current context (optional debug)
-        run: |
-          kubectl --kubeconfig=/tmp/kubeconfig config current-context
+        run: kubectl --kubeconfig=/tmp/kubeconfig config current-context
 
       - name: Deploy to Kubernetes
         run: |
