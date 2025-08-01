@@ -153,8 +153,8 @@ jobs:
           scan-ref: kubernetes-manifest/
           format: table
           severity: "CRITICAL,HIGH"
-  
-    k8s-deploy:
+
+  k8s-deploy:
     needs: [frontend-image, backend-image]
     runs-on: ubuntu-latest
     steps:
@@ -181,4 +181,3 @@ jobs:
           kubectl apply -f kubernetes-manifest/ingress.yaml
           kubectl rollout status deployment/backend -n quiz
           kubectl rollout status deployment/frontend -n quiz
-
