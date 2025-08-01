@@ -181,3 +181,6 @@ jobs:
           kubectl apply -f kubernetes-manifest/ingress.yaml
           kubectl rollout status deployment/backend -n quiz
           kubectl rollout status deployment/frontend -n quiz
+      - name: Debug EKS token
+        run: |
+          aws eks get-token --cluster-name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
